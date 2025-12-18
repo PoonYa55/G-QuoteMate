@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QuoteMate - Premium Quotation System</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&family=Outfit:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"
+    integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <style>
+    body {
+      font-family: 'Prompt', sans-serif;
+      background: #F8FAFC;
+      /* Slate-50 */
+      background-image:
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+      background-attachment: fixed;
+      color: #1E293B;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Glassmorphism Card */
+    .card-glass {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
+      border-radius: 1.5rem;
+    }
+
+    /* Premium Gradient Button */
+    .btn-gradient {
+      background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+      color: white;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
+    }
+
+    .btn-gradient:hover {
+      box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.4);
+      transform: translateY(-2px);
+    }
+
+    .btn-gradient:active {
+      transform: translateY(0);
+    }
+
+    .btn-gradient:disabled {
+      background: #CBD5E1;
+      transform: none;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Custom Inputs */
+    .input-premium {
+      background: #F1F5F9;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+      border-radius: 0.75rem;
+    }
+
+    .input-premium:focus {
+      background: #FFFFFF;
+      border-color: #6366F1;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in {
+      animation: fadeInUp 0.4s ease-out forwards;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .spinner {
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(99, 102, 241, 0.2);
+      border-top-color: #6366F1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .paper-preview {
+      background: white;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) rotate(-45deg);
+      font-size: 4rem;
+      font-weight: 900;
+      color: rgba(226, 232, 240, 0.4);
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 0;
+      user-select: none;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen pb-24">
+
+  <!-- HOME VIEW -->
+  <div id="view-home" class="max-w-md mx-auto p-6 fade-in">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-10 mt-4">
+      <div>
+        <h1
+          class="text-4xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-blue-700 to-purple-600"
+          style="font-family: 'Outfit', sans-serif;">QuoteMate</h1>
+        <p class="text-sm text-slate-500 font-medium ml-1">Premium Quotation System</p>
+      </div>
+      <div
+        class="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 transform rotate-3">
+        <span class="text-white font-bold text-lg" style="font-family: 'Outfit', sans-serif;">QM</span>
+      </div>
+    </div>
+
+    <!-- Main Action -->
+    <button onclick="nav('view-editor')"
+      class="w-full btn-gradient py-6 rounded-3xl font-bold text-lg mb-10 flex justify-center items-center gap-3 relative overflow-hidden group">
+      <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
+      </svg>
+      <span>สร้างใบเสนอราคาใหม่</span>
+    </button>
+
+    <!-- Recent History -->
+    <div class="flex items-center justify-between mb-5 px-1">
+      <h3 class="font-bold text-slate-400 text-xs uppercase tracking-widest">Recent History</h3>
+      <span class="text-[10px] bg-slate-100 text-slate-400 px-2 py-1 rounded-md">Live Sync</span>
+    </div>
+
+    <div id="history-container" class="space-y-4">
+      <div class="text-center py-12">
+        <div class="spinner mx-auto mb-3"></div>
+        <p class="text-slate-400 text-sm font-medium">กำลังดึงข้อมูล...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDITOR VIEW -->
+  <div id="view-editor" class="hidden max-w-md mx-auto p-6 fade-in">
+    <!-- Top Nav -->
+    <div class="flex items-center justify-between mb-8 mt-2">
+      <button onclick="nav('view-home')"
+        class="text-slate-400 hover:text-slate-600 transition-colors flex items-center gap-1 font-medium text-sm">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        ย้อนกลับ
+      </button>
+      <h2 class="text-lg font-bold text-slate-800">New Quote</h2>
+      <button id="btn-save" onclick="submitData()"
+        class="bg-blue-50 text-blue-600 hover:bg-blue-100 px-5 py-2 rounded-full font-bold text-sm transition-colors">
+        บันทึก
+      </button>
+    </div>
+
+    <!-- Customer Section -->
+    <div class="card-glass p-6 mb-6">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-2 h-2 rounded-full bg-blue-500"></div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">ข้อมูลลูกค้า (Customer)</label>
+      </div>
+
+      <div class="space-y-3">
+        <input list="contacts-db" id="inp-cust-name" onchange="onContactSelect(this.value)"
+          placeholder="ค้นหาหรือระบุชื่อลูกค้า..."
+          class="input-premium w-full p-3 font-semibold text-slate-800 placeholder-slate-400">
+        <datalist id="contacts-db"></datalist>
+
+        <textarea id="inp-cust-address" placeholder="ที่อยู่ลูกค้า..."
+          class="input-premium w-full p-3 text-sm text-slate-600 min-h-[80px] resize-none"></textarea>
+      </div>
+    </div>
+
+    <!-- Items Section -->
+    <div class="card-glass p-6">
+      <div class="flex items-center gap-2 mb-4">
+        <div class="w-2 h-2 rounded-full bg-purple-500"></div>
+        <label class="text-xs font-bold text-slate-500 uppercase tracking-wider">รายการ (Items)</label>
+      </div>
+
+      <div id="items-list" class="space-y-4">
+        <!-- Item Row -->
+        <div class="item-row group">
+          <div class="flex gap-3 mb-2">
+            <input list="products-db" placeholder="ชื่อสินค้า/บริการ"
+              class="itm-name input-premium flex-1 p-2 text-sm font-medium text-slate-700">
+          </div>
+          <div class="flex gap-3 items-center">
+            <div class="flex items-center bg-slate-100 rounded-lg p-1">
+              <span class="text-xs text-slate-400 px-2">จำนวน</span>
+              <input type="number" value="1" oninput="calc()"
+                class="itm-qty w-12 text-center bg-white rounded-md text-sm font-bold text-slate-700 py-1 focus:outline-none focus:ring-1 ring-blue-500">
+            </div>
+            <div class="flex-1 relative">
+              <span class="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs">฿</span>
+              <input type="number" placeholder="0.00" oninput="calc()"
+                class="itm-price w-full input-premium py-2 pl-6 pr-3 text-right text-sm font-bold text-slate-700">
+            </div>
+          </div>
+          <div class="border-b border-dashed border-slate-200 mt-4"></div>
+        </div>
+      </div>
+
+      <button onclick="addNewRow()"
+        class="w-full mt-4 py-3 rounded-xl border-2 border-dashed border-slate-200 text-xs font-bold text-slate-400 hover:border-blue-300 hover:text-blue-500 hover:bg-blue-50 transition-all flex items-center justify-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        เพิ่มรายการ
+      </button>
+
+      <!-- Total Section -->
+      <div class="mt-8 pt-6 border-t border-slate-100">
+        <div class="flex justify-between items-end">
+          <span class="text-slate-400 font-bold text-xs uppercase mb-1">ยอดรวมสุทธิ (Grand Total)</span>
+          <span id="display-grand-total"
+            class="text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-700 to-purple-600"
+            style="font-family: 'Outfit', sans-serif;">฿0</span>
+        </div>
+      </div>
+    </div>
+
+    <datalist id="products-db"></datalist>
+
+    <!-- Sticky Footer for Editor -->
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t border-gray-200 z-50">
+      <div class="max-w-md mx-auto">
+        <button onclick="openPreview()"
+          class="w-full bg-gray-800 text-white hover:bg-gray-900 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-gray-300 transition-all flex justify-center items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z">
+            </path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z">
+            </path>
+          </svg>
+          ดูตัวอย่างเอกสาร
+        </button>
+      </div>
+    </div>
+    <!-- Spacer for sticky footer -->
+    <div class="h-24"></div>
+  </div>
+
+  <!-- PREVIEW VIEW -->
+  <div id="view-preview" class="hidden max-w-md mx-auto p-4 fade-in bg-slate-50 min-h-screen relative pb-32">
+    <!-- Top Nav -->
+    <div class="flex items-center justify-between mb-6 mt-2">
+      <button onclick="nav('view-editor')"
+        class="text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-1 font-bold text-sm bg-white px-3 py-1.5 rounded-lg shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+        </svg>
+        แก้ไข
+      </button>
+      <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider">ตัวอย่างเอกสาร</h2>
+      <div class="w-16"></div> <!-- Spacer for center alignment -->
+    </div>
+
+    <!-- The Paper Document -->
+    <div class="paper-preview rounded-none sm:rounded-lg p-6 sm:p-8 text-xs sm:text-sm text-slate-600 relative">
+      <!-- Watermark -->
+      <div class="watermark">PREVIEW MODE</div>
+
+      <!-- Header -->
+      <div class="flex justify-between items-start mb-8 relative z-10">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <div
+              class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-xs">
+              QM
+            </div>
+            <h1 class="text-xl font-bold text-slate-800" style="font-family: 'Outfit', sans-serif;">QuoteMate</h1>
+          </div>
+          <p class="text-slate-400 text-[10px]">Premium Quotation System</p>
+          <p class="text-slate-400 text-[10px]">www.quotemate.com</p>
+        </div>
+        <div class="text-right">
+          <h2 class="text-2xl font-bold text-slate-200 uppercase tracking-tighter">Quotation</h2>
+          <p class="text-slate-400 text-[10px] mt-1">Date: <span id="prev-date" class="font-bold text-slate-600"></span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Customer Info -->
+      <div class="mb-8 relative z-10">
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1 block">Customer</label>
+        <h3 id="prev-cust-name" class="font-bold text-lg text-slate-800"></h3>
+        <p id="prev-cust-address" class="text-slate-500 whitespace-pre-line text-xs mt-1"></p>
+      </div>
+
+      <!-- Items Table -->
+      <div class="mb-8 relative z-10">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="border-b-2 border-slate-100">
+              <th class="py-2 text-[10px] font-bold text-slate-400 uppercase">Description</th>
+              <th class="py-2 text-[10px] font-bold text-slate-400 uppercase text-right w-16">Qty</th>
+              <th class="py-2 text-[10px] font-bold text-slate-400 uppercase text-right w-24">Total</th>
+            </tr>
+          </thead>
+          <tbody id="prev-items-body" class="text-slate-700">
+            <!-- Items rendered here -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Totals -->
+      <div class="flex justify-end relative z-10">
+        <div class="w-1/2 space-y-2">
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-400">Subtotal</span>
+            <span id="prev-subtotal" class="font-bold"></span>
+          </div>
+          <div class="flex justify-between text-xs">
+            <span class="text-slate-400">VAT 7%</span>
+            <span class="text-slate-400">-</span>
+          </div>
+          <div class="border-t border-slate-100 my-2"></div>
+          <div class="flex justify-between items-end">
+            <span class="font-bold text-sm text-slate-800">Grand Total</span>
+            <span id="prev-grand-total" class="font-bold text-xl text-blue-600"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="mt-12 text-center relative z-10">
+        <p class="text-[10px] text-slate-300">Created by QuickQuote Free Version</p>
+      </div>
+    </div>
+
+    <!-- Sticky Footer Actions -->
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white/90 backdrop-blur-md border-t border-slate-200 z-50">
+      <div class="max-w-md mx-auto flex gap-3">
+        <button onclick="alert('ฟีเจอร์นี้สำหรับเวอร์ชั่น Pro เท่านั้น (This feature is for Pro version)')"
+          class="flex-1 bg-amber-100 text-amber-700 hover:bg-amber-200 py-3 rounded-xl font-bold text-sm transition-colors">
+          ลบลายน้ำ (299.-)
+        </button>
+        <button id="btn-share-pdf" onclick="generatePDF()"
+          class="flex-[2] btn-gradient py-3 rounded-xl font-bold text-white shadow-lg shadow-indigo-200 flex justify-center items-center gap-2">
+          แชร์ / ส่ง PDF
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z">
+            </path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- 1. CONFIGURATION ---
+    const CONFIG = {
+      API_URL: 'https://script.google.com/macros/s/AKfycbwg06UrBBgFv9pLeC22plK3udVJbUorYd0_TMzUq-26lQQppO76s7O4200H1WJY9LI4/exec', // *** วาง URL ที่ได้จาก Google Apps Script ที่นี่ ***
+      API_KEY: 'ClinixMate_Secret_2025' // *** ต้องตรงกับใน Code.js ***
+    };
+
+    let db = { contacts: [], products: [] };
+
+    // --- 2. CORE API COMMUNICATION ---
+    async function callBackend(action, payload = {}) {
+      try {
+        const response = await fetch(CONFIG.API_URL, {
+          method: 'POST',
+          mode: 'cors', // รองรับการเรียกข้าม Domain
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // ใช้ text/plain เพื่อเลี่ยง Preflight request ในบางกรณี
+          body: JSON.stringify({
+            apiKey: CONFIG.API_KEY,
+            action: action,
+            payload: payload
+          })
+        });
+
+        if (!response.ok) throw new Error('Network response was not ok');
+
+        const result = await response.json();
+
+        if (result.status !== 200) {
+          throw new Error(result.data.error || 'Unknown error');
+        }
+
+        return result.data;
+      } catch (err) {
+        console.error("API Error:", err);
+        alert("เกิดข้อผิดพลาด: " + err.message);
+        return null;
+      }
+    }
+
+    // --- 3. APP LOGIC ---
+    window.onload = async () => {
+      const data = await callBackend('getInitialData');
+      if (data) {
+        db = data;
+        renderHistory(data.history);
+        populateLists();
+      }
+    };
+
+    function nav(id) {
+      document.getElementById('view-home').classList.add('hidden');
+      document.getElementById('view-editor').classList.add('hidden');
+      document.getElementById('view-preview').classList.add('hidden'); // Add this
+      document.getElementById(id).classList.remove('hidden');
+      window.scrollTo(0, 0); // Scroll to top
+    }
+
+    function openPreview() {
+      // 1. Gather Data
+      const custName = document.getElementById('inp-cust-name').value;
+      const custAddr = document.getElementById('inp-cust-address').value;
+
+      if (!custName) {
+        alert("กรุณาระบุชื่อลูกค้าก่อนดูตัวอย่าง (Please enter customer name)");
+        return;
+      }
+
+      // 2. Render Data to Preview
+      document.getElementById('prev-cust-name').innerText = custName;
+      document.getElementById('prev-cust-address').innerText = custAddr || '-';
+      document.getElementById('prev-date').innerText = new Date().toLocaleDateString('th-TH');
+
+      const tbody = document.getElementById('prev-items-body');
+      tbody.innerHTML = '';
+
+      let total = 0;
+      document.querySelectorAll('.item-row').forEach(row => {
+        const name = row.querySelector('.itm-name').value;
+        const qty = parseFloat(row.querySelector('.itm-qty').value) || 0;
+        const price = parseFloat(row.querySelector('.itm-price').value) || 0;
+
+        if (name) {
+          const lineTotal = qty * price;
+          total += lineTotal;
+          tbody.innerHTML += `
+            <tr class="border-b border-dashed border-slate-100 last:border-0">
+              <td class="py-3 font-medium">${name}</td>
+              <td class="py-3 text-right text-slate-500">${qty}</td>
+              <td class="py-3 text-right font-bold text-slate-700">฿${lineTotal.toLocaleString()}</td>
+            </tr>
+          `;
+        }
+      });
+
+      document.getElementById('prev-subtotal').innerText = "฿" + total.toLocaleString();
+      document.getElementById('prev-grand-total').innerText = "฿" + total.toLocaleString();
+
+      // 3. Switch View
+      nav('view-preview');
+    }
+
+    async function generatePDF() {
+      const element = document.querySelector('.paper-preview');
+      const btn = document.getElementById('btn-share-pdf');
+
+      const originalContent = btn.innerHTML;
+      btn.innerHTML = '<span class="spinner w-4 h-4 border-2 border-white border-t-transparent inline-block"></span> สร้าง PDF...';
+      btn.disabled = true;
+
+      // Ensure Images/Fonts are loaded
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      const opt = {
+        margin: [5, 5],
+        filename: `Quote-${new Date().getTime()}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      try {
+        // Generate PDF and force Download
+        await html2pdf().set(opt).from(element).save();
+      } catch (err) {
+        console.error("PDF Generate Error:", err);
+        // Fallback if specific sharing failed
+        try {
+          await html2pdf().set(opt).from(element).save();
+        } catch (e) {
+          alert('ไม่สามารถสร้าง PDF ได้ในขณะนี้');
+        }
+      } finally {
+        btn.innerHTML = originalContent;
+        btn.disabled = false;
+      }
+    }
+
+    function loadQuote(qId) {
+      const quote = db.history.find(q => q.QuoteID === qId);
+      if (!quote) return;
+
+      // 1. Fill Customer Info
+      document.getElementById('inp-cust-name').value = quote.CustomerName;
+      // Try to find address from contacts database again to ensure latest data, 
+      // or fallback to empty if not found (user can re-enter)
+      onContactSelect(quote.CustomerName);
+
+      // 2. Clear and Fill Items
+      const container = document.getElementById('items-list');
+      const firstRow = container.querySelector('.item-row').cloneNode(true);
+      container.innerHTML = '';
+
+      // If quote has items, loop and create rows
+      if (quote.Items && quote.Items.length > 0) {
+        quote.Items.forEach(item => {
+          const newRow = firstRow.cloneNode(true);
+          newRow.querySelector('.itm-name').value = item.ItemName || item.Name || item.name || '';
+          newRow.querySelector('.itm-qty').value = item.Qty || item.qty || 1;
+          newRow.querySelector('.itm-price').value = item.Price || item.price || 0;
+          container.appendChild(newRow);
+        });
+      } else {
+        // Fallback if no items found ( shouldn't happen )
+        container.appendChild(firstRow);
+      }
+
+      // 3. Recalculate
+      calc();
+
+      // 4. Go to Editor
+      nav('view-editor');
+
+      // Optional: Show a small toast/notice
+      // alert(`Loaded Quote ${qId}`);
+    }
+
+    function populateLists() {
+      const cList = document.getElementById('contacts-db');
+      // Fix: Check for different casing of Name/name
+      cList.innerHTML = db.contacts.map(c => `<option value="${c.Name || c.name || ''}">`).join('');
+
+      const pList = document.getElementById('products-db');
+      pList.innerHTML = db.products.map(p => `<option value="${p.ProductName || p.productname || p.Name || ''}">`).join('');
+    }
+
+    function onContactSelect(val) {
+      const found = db.contacts.find(c => c.Name === val || c.name === val);
+      if (found) {
+        // Check Address/Phone property casing as well
+        const addr = found.Address || found.address || '';
+        const phone = found.Phone || found.phone || '';
+        document.getElementById('inp-cust-address').value = `${addr}\nโทร: ${phone}`;
+      }
+    }
+
+    function calc() {
+      let total = 0;
+      document.querySelectorAll('.item-row').forEach(row => {
+        const q = parseFloat(row.querySelector('.itm-qty').value) || 0;
+        const p = parseFloat(row.querySelector('.itm-price').value) || 0;
+        total += (q * p);
+      });
+      document.getElementById('display-grand-total').innerText = "฿" + total.toLocaleString();
+      return total;
+    }
+
+    async function submitData() {
+      const btn = document.getElementById('btn-save');
+      const payload = {
+        custName: document.getElementById('inp-cust-name').value,
+        date: new Date().toLocaleDateString('th-TH'),
+        grandTotal: calc(),
+        items: []
+      };
+
+      if (!payload.custName) return alert("กรุณาใส่ชื่อลูกค้า");
+
+      document.querySelectorAll('.item-row').forEach(row => {
+        const name = row.querySelector('.itm-name').value;
+        if (name) {
+          payload.items.push({
+            name: name,
+            qty: parseFloat(row.querySelector('.itm-qty').value) || 0,
+            price: parseFloat(row.querySelector('.itm-price').value) || 0
+          });
+        }
+      });
+
+      // UI Feedback
+      btn.disabled = true;
+      btn.innerHTML = `<span class="spinner w-4 h-4 border-2 border-blue-600 border-t-transparent inline-block"></span>`;
+
+      const res = await callBackend('saveNewQuote', payload);
+
+      if (res && res.success) {
+        alert("บันทึกใบเสนอราคา " + res.id + " สำเร็จ!");
+        location.reload();
+      } else {
+        btn.disabled = false;
+        btn.innerText = "บันทึก";
+      }
+    }
+
+    // --- Helper Functions for History ---
+    function formatThaiDate(dateStr) {
+      if (!dateStr) return '';
+      let dateObj = new Date(dateStr);
+
+      // Handle invalid date or Buddhist Year parsed as Gregorian (e.g., year 2568)
+      if (isNaN(dateObj.getTime()) || dateObj.getFullYear() > 2400) {
+        // Attempt to manually parse standard ISO-like string with Buddhist year
+        const match = dateStr.match(/^(\d{4})-(\d{2})-(\d{2})/);
+        if (match) {
+          let y = parseInt(match[1]);
+          const m = parseInt(match[2]) - 1;
+          const d = parseInt(match[3]);
+          if (y > 2400) y -= 543; // Convert to Gregorian
+          dateObj = new Date(y, m, d);
+        }
+      }
+
+      if (isNaN(dateObj.getTime())) return dateStr; // Fallback
+
+      return dateObj.toLocaleDateString('th-TH', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+    }
+
+    function getStatusStyle(status) {
+      // Premium Status Styles
+      const map = {
+        'Complete': 'bg-emerald-100 text-emerald-700 border-emerald-200',
+        'Pending': 'bg-amber-100 text-amber-700 border-amber-200',
+        'รอดำเนินการ': 'bg-blue-50 text-blue-600 border-blue-100', // Premium Blue for standard pending
+        'Cancelled': 'bg-rose-50 text-rose-600 border-rose-100'
+      };
+
+      // Default style
+      const defaultStyle = 'bg-slate-100 text-slate-600 border-slate-200';
+
+      // Check for partial matches or direct key
+      const key = Object.keys(map).find(k => status.includes(k)) || 'Default';
+      return map[status] || map[key] || defaultStyle;
+    }
+
+    function renderHistory(data) {
+      const container = document.getElementById('history-container');
+      if (!data || data.length === 0) {
+        container.innerHTML = `<div class="text-center py-12 opacity-60">
+            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3">
+               <svg class="w-8 h-8 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <p class="text-slate-400 text-sm font-medium">ยังไม่มีประวัติรายการ</p>
+        </div>`;
+        return;
+      }
+
+      // Show only last 10 transactions
+      container.innerHTML = data.slice(0, 10).map(h => {
+        const name = h.CustomerName || h['Customer Name'] || h.Name || h.name || h.Customer || 'ไม่ระบุชื่อ';
+        const qId = h.QuoteID || '';
+        const dateFormatted = formatThaiDate(h.Date);
+        const status = h.Status || 'Active';
+        const statusClass = getStatusStyle(status);
+
+        // Extract items string
+        let itemsStr = '-';
+        const itemsList = h.Items || h.items || [];
+        if (Array.isArray(itemsList) && itemsList.length > 0) {
+          itemsStr = itemsList.map(i => i.ItemName || i.name || i.Name || 'สินค้า').join(', ');
+        }
+
+        return `
+            <div onclick="loadQuote('${qId}')" class="card-glass group cursor-pointer hover:shadow-lg hover:shadow-indigo-500/10 hover:-translate-y-0.5 transition-all duration-300 border border-white/60">
+                <div class="p-4 flex justify-between items-center gap-3">
+                    <!-- Left: Icon & Info -->
+                    <div class="flex items-center gap-4 overflow-hidden">
+                        <!-- Adjusted Avatar: Solid Gradient Background + White Text -->
+                        <div class="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-md group-hover:shadow-indigo-500/30 transition-shadow">
+                            ${name.charAt(0).toUpperCase()}
+                        </div>
+                        
+                        <div class="flex flex-col min-w-0">
+                            <h4 class="font-bold text-slate-800 text-sm truncate group-hover:text-indigo-600 transition-colors" style="font-family: 'Outfit', sans-serif;">
+                                ${name}
+                            </h4>
+                            
+                            <!-- New Items Row -->
+                            <p class="text-xs text-slate-500 truncate mt-0.5">
+                                ${itemsStr}
+                            </p>
+
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="text-[10px] text-slate-400 font-medium truncate">${dateFormatted}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Status Badge & Price -->
+                    <div class="flex flex-col items-end gap-1">
+                         <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border shadow-sm ${statusClass}">
+                            ${status}
+                         </span>
+                         <span class="text-xs font-bold text-slate-700 bg-slate-100/80 px-2 py-0.5 rounded-md">
+                            ฿${Number(h.GrandTotal || h.grandTotal || 0).toLocaleString()}
+                        </span>
+                    </div>
+                </div>
+            </div>
+      `}).join('');
+    }
+
+    function addNewRow() {
+      const container = document.getElementById('items-list');
+      // Clone the first row as template
+      const template = container.querySelector('.item-row');
+      const newRow = template.cloneNode(true);
+      newRow.querySelectorAll('input').forEach(i => i.value = i.defaultValue);
+      container.appendChild(newRow);
+    }
+  </script>
+</body>
+
+</html>
