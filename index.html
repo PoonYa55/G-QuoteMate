@@ -351,13 +351,20 @@
       </div>
 
       <div class="space-y-3">
-        <input list="contacts-db" id="inp-cust-name" onchange="onContactSelect(this.value)"
+        <input list="customers-db" id="inp-cust-name" onchange="onCustomerSelect(this.value)"
           placeholder="ค้นหาหรือระบุชื่อลูกค้า..."
           class="input-premium w-full p-3 font-semibold text-slate-800 placeholder-slate-400">
-        <datalist id="contacts-db"></datalist>
+        <datalist id="customers-db"></datalist>
 
         <textarea id="inp-cust-address" placeholder="ที่อยู่ลูกค้า..."
           class="input-premium w-full p-3 text-sm text-slate-600 min-h-[80px] resize-none"></textarea>
+
+        <div class="grid grid-cols-2 gap-3">
+          <input type="tel" id="inp-cust-phone" placeholder="เบอร์โทรศัพท์..."
+            class="input-premium w-full p-3 text-sm text-slate-600">
+          <input type="email" id="inp-cust-email" placeholder="อีเมล..."
+            class="input-premium w-full p-3 text-sm text-slate-600">
+        </div>
       </div>
     </div>
 
@@ -547,7 +554,7 @@
       API_KEY: 'ClinixMate_Secret_2025' // *** ต้องตรงกับใน Code.js ***
     };
 
-    let db = { contacts: [], products: [] };
+    let db = { customers: [], products: [] };
 
     // --- 2. CORE API COMMUNICATION ---
     async function callBackend(action, payload = {}) {
@@ -611,7 +618,24 @@
       // 2. Render Data to Preview
       document.getElementById('prev-cust-name').innerText = custName;
       document.getElementById('prev-cust-address').innerText = custAddr || '-';
-      document.getElementById('prev-date').innerText = new Date().toLocaleDateString('th-TH');
+
+      // Update Preview to show Tel/Email if available
+      const phone = document.getElementById('inp-cust-phone').value;
+      const email = document.getElementById('inp-cust-email').value;
+      if (phone || email) {
+        let contactStr = "";
+        if (phone) contactStr += `Tel: ${phone} `;
+        if (email) contactStr += `Email: ${email}`;
+        document.getElementById('prev-cust-address').innerText += '\n' + contactStr;
+      }
+
+      document.getElementById('prev-date').innerText = new Date().toLocaleString('th-TH', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
 
       const tbody = document.getElementById('prev-items-body');
       tbody.innerHTML = '';
@@ -686,7 +710,7 @@
       document.getElementById('inp-cust-name').value = quote.CustomerName;
       // Try to find address from contacts database again to ensure latest data, 
       // or fallback to empty if not found (user can re-enter)
-      onContactSelect(quote.CustomerName);
+      onCustomerSelect(quote.CustomerName);
 
       // 2. Clear and Fill Items
       const container = document.getElementById('items-list');
@@ -718,21 +742,25 @@
     }
 
     function populateLists() {
-      const cList = document.getElementById('contacts-db');
+      const cList = document.getElementById('customers-db');
       // Fix: Check for different casing of Name/name
-      cList.innerHTML = db.contacts.map(c => `<option value="${c.Name || c.name || ''}">`).join('');
+      cList.innerHTML = db.customers.map(c => `<option value="${c.Name || c.name || ''}">`).join('');
 
       const pList = document.getElementById('products-db');
       pList.innerHTML = db.products.map(p => `<option value="${p.ProductName || p.productname || p.Name || ''}">`).join('');
     }
 
-    function onContactSelect(val) {
-      const found = db.contacts.find(c => c.Name === val || c.name === val);
+    function onCustomerSelect(val) {
+      const found = db.customers.find(c => c.Name === val || c.name === val);
       if (found) {
         // Check Address/Phone property casing as well
         const addr = found.Address || found.address || '';
         const phone = found.Phone || found.phone || '';
-        document.getElementById('inp-cust-address').value = `${addr}\nโทร: ${phone}`;
+        const email = found.Email || found.email || '';
+
+        document.getElementById('inp-cust-address').value = addr;
+        document.getElementById('inp-cust-phone').value = phone;
+        document.getElementById('inp-cust-email').value = email;
       }
     }
 
@@ -751,9 +779,16 @@
       const btn = document.getElementById('btn-save');
       const payload = {
         custName: document.getElementById('inp-cust-name').value,
-        date: new Date().toLocaleDateString('th-TH'),
+        date: (() => {
+          const d = new Date();
+          const pad = (n) => String(n).padStart(2, '0');
+          return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+        })(),
         grandTotal: calc(),
-        items: []
+        items: [],
+        custAddr: document.getElementById('inp-cust-address').value,
+        custPhone: document.getElementById('inp-cust-phone').value,
+        custEmail: document.getElementById('inp-cust-email').value
       };
 
       if (!payload.custName) return alert("กรุณาใส่ชื่อลูกค้า");
@@ -804,11 +839,12 @@
 
       if (isNaN(dateObj.getTime())) return dateStr; // Fallback
 
-      return dateObj.toLocaleDateString('th-TH', {
-        weekday: 'long',
+      return dateObj.toLocaleString('th-TH', {
+        year: 'numeric',
+        month: 'short',
         day: 'numeric',
-        month: 'long',
-        year: 'numeric'
+        hour: '2-digit',
+        minute: '2-digit'
       });
     }
 
